@@ -2,25 +2,25 @@ pipeline {
     agent any
 
     tools {
-        // These names MUST match: Manage Jenkins -> Tools
+        // MUST match: Manage Jenkins -> Tools
         jdk   'jdk17'
         maven 'maven3'
     }
 
     environment {
         // MUST match: Manage Jenkins -> System -> SonarQube servers -> Name
-        SONARQUBE_SERVER = 'sonarqube'
+        SONARQUBE_SERVER   = 'sonarqube-server'
 
-        // Change these to your project values (keep simple)
-        SONAR_PROJECT_KEY  = 'java-mini-project'
-        SONAR_PROJECT_NAME = 'java-mini-project'
+        // SonarCloud details
+        SONAR_ORG          = 'HARIDEVOPS03'
+        SONAR_PROJECT_KEY  = 'haridevops03_factorial'
+        SONAR_PROJECT_NAME = 'factorial'
     }
 
     stages {
 
         stage('Checkout code') {
             steps {
-                // Webhook triggers the job; this checks out the same repo that contains Jenkinsfile
                 checkout scm
             }
         }
@@ -30,6 +30,7 @@ pipeline {
                 withSonarQubeEnv("${SONARQUBE_SERVER}") {
                     sh """
                       mvn -B clean verify sonar:sonar \
+                        -Dsonar.organization=${SONAR_ORG} \
                         -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
                         -Dsonar.projectName=${SONAR_PROJECT_NAME}
                     """
@@ -39,8 +40,6 @@ pipeline {
 
         stage('Quality Gate') {
             steps {
-                // IMPORTANT: Configure SonarQube webhook to Jenkins endpoint:
-                // http://<JENKINS_HOST>:<PORT>/sonarqube-webhook/
                 timeout(time: 10, unit: 'MINUTES') {
                     waitForQualityGate abortPipeline: true
                 }
@@ -49,7 +48,6 @@ pipeline {
 
         stage('Build application') {
             steps {
-                // Build only after Quality Gate passes
                 sh "mvn -B package -DskipTests"
             }
         }
@@ -57,7 +55,9 @@ pipeline {
 
     post {
         always {
-            archiveArtifacts artifacts: 'target/*.jar,target/*.war', fingerprint: true, allowEmptyArchive: true
+            archiveArtifacts artifacts: 'target/*.jar,target/*.war',
+                             fingerprint: true,
+                             allowEmptyArchive: true
         }
     }
 }
