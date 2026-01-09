@@ -42,7 +42,6 @@ pipeline {
                             echo "Webhook not available on current SonarCloud plan → skipping blocking Quality Gate."
                       }
                     }
-                }
         stage('Build application') {
             steps {
                 sh "mvn -B package -DskipTests"
