@@ -29,10 +29,11 @@ pipeline {
             steps {
                 withSonarQubeEnv("${SONARQUBE_SERVER}") {
                     sh """
-                      mvn -B clean verify sonar:sonar \
-                        -Dsonar.organization=${SONAR_ORG} \
-                        -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
-                        -Dsonar.projectName=${SONAR_PROJECT_NAME}
+                      mvn -B clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+                          -Dsonar.organization=HARIDEVOPS03 \
+                          -Dsonar.projectKey=haridevops03_factorial \
+                          -Dsonar.projectName=factorial
+
                     """
                 }
             }
