@@ -24,29 +24,26 @@ pipeline {
                 checkout scm
             }
         }
-
-         stage('SonarCloud Analysis') {
-              steps {
-              withCredentials([string(credentialsId: 'sonar-cred', variable: 'SONAR_TOKEN')]) {
-                        sh """
-                        mvn -B clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-                          -Dsonar.host.url=https://sonarcloud.io \
-                          -Dsonar.organization=haridevops03 \
-                          -Dsonar.projectKey=haridevops03_factorial \
-                          -Dsonar.projectName=factorial \
-                          -Dsonar.token=$SONAR_TOKEN
-                        """
+                stage('Sonar Analysis') {
+                  steps {
+                    withSonarQubeEnv('sonarcloud') {
+                      sh """
+                      mvn -B clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+                        -Dsonar.organization=haridevops03 \
+                        -Dsonar.projectKey=haridevops03_factorial \
+                        -Dsonar.projectName=factorial
+                      """
                     }
-              }
-         }
-        stage('Quality Gate') {
-            steps {
-                timeout(time: 10, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
+                  }
                 }
-            }
-        }
-
+                
+                stage('Quality Gate') {
+                  steps {
+                    timeout(time: 10, unit: 'MINUTES') {
+                      waitForQualityGate abortPipeline: true
+                    }
+                  }
+                }
         stage('Build application') {
             steps {
                 sh "mvn -B package -DskipTests"
