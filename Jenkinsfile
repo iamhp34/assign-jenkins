@@ -27,19 +27,18 @@ pipeline {
 
          stage('SonarCloud Analysis') {
               steps {
-                withCredentials([string(credentialsId: 'sonarcloud-token', variable: 'SONAR_TOKEN')]) {
-                  sh """
-                  mvn -B clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-                    -Dsonar.host.url=https://sonarcloud.io \
-                    -Dsonar.organization=haridevops03 \
-                    -Dsonar.projectKey=haridevops03_factorial \
-                    -Dsonar.projectName=factorial \
-                    -Dsonar.token=$SONAR_TOKEN
-                  """
-                }
+              withCredentials([string(credentialsId: 'sonar-cred', variable: 'SONAR_TOKEN')]) {
+                        sh """
+                        mvn -B clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+                          -Dsonar.host.url=https://sonarcloud.io \
+                          -Dsonar.organization=haridevops03 \
+                          -Dsonar.projectKey=haridevops03_factorial \
+                          -Dsonar.projectName=factorial \
+                          -Dsonar.token=$SONAR_TOKEN
+                        """
+                    }
               }
-            }
-
+         }
         stage('Quality Gate') {
             steps {
                 timeout(time: 10, unit: 'MINUTES') {
