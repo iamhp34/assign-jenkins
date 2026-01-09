@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent slave
 
     tools {
         // MUST match: Manage Jenkins -> Tools
