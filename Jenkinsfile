@@ -48,7 +48,7 @@ pipeline {
 
         stage('Upload to Artifactory') {
             steps {
-                withCredentials([string(credentialsId: 'artifactory-cred', variable: 'ART_TOKEN')]) {
+                withCredentials([string(credentialsId: 'artifact-cred', variable: 'ART_TOKEN')]) {
                     sh '''
                         set -e
 
