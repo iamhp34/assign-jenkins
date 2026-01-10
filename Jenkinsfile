@@ -55,14 +55,13 @@ pipeline {
                         ART_URL="http://13.200.21.76:8082"
                         JAR_DIR="/home/ec2-user/jenkins/workspace/assign/target"
                         REPO_PATH="libs-snapshot-local/assign/${BUILD_NUMBER}/"
-
+                        
                         echo "Files in target:"
                         ls -lah "$JAR_DIR"
-
+                        
                         for f in "$JAR_DIR"/*.jar; do
                           echo "Uploading $f"
-
-                          curl -f -H "X-JFrog-Art-Api: $ART_TOKEN" \
+                          curl -f -H "Authorization: Bearer $ART_TOKEN" \
                                -T "$f" \
                                "$ART_URL/artifactory/$REPO_PATH$(basename "$f")"
                         done
